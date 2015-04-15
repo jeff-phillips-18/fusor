@@ -105,6 +105,12 @@ module Actions
         def assign_hostgroup_using_discovery(assignee_host, hostgroup)
           raise "no host available to assign" if assignee_host.nil?
 
+          if ActiveRecord::Base.connection.open_transactions <= 0
+            Rails.logger.warn "XXX we're NOT in a transaction"
+          else
+            Rails.logger.warn "XXX We are IN a transaction"
+          end
+
           Rails.logger.warn "XXX converting host using ForemanDiscovery"
           # host, setmanaged, setbuild
           host = ::ForemanDiscovery::HostConverter.to_managed(assignee_host, true, true)
