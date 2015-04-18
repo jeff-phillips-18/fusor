@@ -80,7 +80,6 @@ module Actions
           Rails.logger.warn "XXX finalize: calling assign_host_to_hostgroup (engine)"
 
           #success, host = assign_host_to_hostgroup(deployment.rhev_engine_host, engine_group)
-
           success, host = assign_hostgroup_using_discovery(deployment.rhev_engine_host, engine_group)
 
           Rails.logger.warn "XXX returned from assign_hostgroup_using_discovery. #{success}"
@@ -111,9 +110,9 @@ module Actions
             Rails.logger.warn "XXX We are IN a transaction"
           end
 
-          Rails.logger.warn "XXX converting host using ForemanDiscovery"
+          Rails.logger.warn "XXX converting host using HostConverter"
           # host, setmanaged, setbuild
-          host = ::ForemanDiscovery::HostConverter.to_managed(assignee_host, true, true)
+          host = HostConverter.to_managed(assignee_host, true, true)
           Rails.logger.warn "XXX the host is now #{host.type}" unless host.nil?
 
           host.hostgroup = hostgroup
@@ -126,6 +125,7 @@ module Actions
 
           Rails.logger.warn "XXX do we have an error?"
         end
+
         #
         # "borrowed" from staypuft:
         # https://github.com/theforeman/staypuft/blob/master/app/controllers/staypuft/deployments_controller.rb#L158-L216
