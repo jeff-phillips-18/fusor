@@ -112,6 +112,9 @@ module Actions
 
           Rails.logger.warn "XXX converting host using HostConverter"
           # host, setmanaged, setbuild
+
+          Rails.logger.warn "XXX host type #{assignee_host.type}"
+          Rails.logger.warn "XXX interface: #{assignee_host.primary_interface.type}"
           host = HostConverter.to_managed(assignee_host, true, true)
           Rails.logger.warn "XXX the host is now #{host.type}" unless host.nil?
 
