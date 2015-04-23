@@ -79,10 +79,9 @@ module Actions
 
           Rails.logger.warn "XXX finalize: calling assign_host_to_hostgroup (engine)"
 
-          #success, host = assign_host_to_hostgroup(deployment.rhev_engine_host, engine_group)
-          success, host = assign_hostgroup_using_discovery(deployment.rhev_engine_host, engine_group)
+          success, host = assign_host_to_hostgroup(deployment.rhev_engine_host, engine_group)
 
-          Rails.logger.warn "XXX returned from assign_hostgroup_using_discovery. #{success}"
+          Rails.logger.warn "XXX returned from assign_hostgroup_using_hostgroup. #{success}"
           if host
             Rails.logger.warn "XXX engine host is NOT null! YAY!"
             reboot_host(host)
@@ -99,34 +98,6 @@ module Actions
 
         def find_hypervisor_hostgroup(deployment)
           find_hostgroup(deployment, "RHEV-Hypervisor")
-        end
-
-        def assign_hostgroup_using_discovery(assignee_host, hostgroup)
-          raise "no host available to assign" if assignee_host.nil?
-
-          if ActiveRecord::Base.connection.open_transactions <= 0
-            Rails.logger.warn "XXX we're NOT in a transaction"
-          else
-            Rails.logger.warn "XXX We are IN a transaction"
-          end
-
-          Rails.logger.warn "XXX converting host using HostConverter"
-          # host, setmanaged, setbuild
-
-          Rails.logger.warn "XXX host type #{assignee_host.type}"
-          Rails.logger.warn "XXX interface: #{assignee_host.primary_interface.type}"
-          host = HostConverter.to_managed(assignee_host, true, true)
-          Rails.logger.warn "XXX the host is now #{host.type}" unless host.nil?
-
-          host.hostgroup = hostgroup
-
-          # root_pass is not copied for some reason
-          host.root_pass = hostgroup.root_pass
-
-          # TODO: calling save to explicitly see errors in log
-          host.save!
-
-          Rails.logger.warn "XXX do we have an error?"
         end
 
         #
